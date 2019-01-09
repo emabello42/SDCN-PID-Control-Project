@@ -1,0 +1,22 @@
+KP KI KD
+
+1)
+PID steering: 1	0 0
+PID throtle: 1 0 0
+video: pid_00000.mp4
+
+2)
+PID steering: 0	.0001 0
+PID throtle: 0 0.001 0
+video: pid_00001.mp4
+observation: very bad, must be very small
+
+3)
+KD alone has no effect
+
+
+4)
+PID steering: 1	0 1
+PID throtle: 1 0 1
+video: pid_00002.mp4
+observation: better than 1

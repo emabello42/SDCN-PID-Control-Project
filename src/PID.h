@@ -1,6 +1,7 @@
 #ifndef PID_H
 #define PID_H
-
+#include <vector>
+using namespace std;
 class PID {
 public:
   /*
@@ -41,6 +42,11 @@ public:
   * Calculate the total PID error.
   */
   double TotalError();
+
+
+private:
+  double prev_cte;
+  double cte_sum;
 };
 
 #endif /* PID_H */
