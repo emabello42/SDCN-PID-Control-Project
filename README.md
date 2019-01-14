@@ -4,7 +4,7 @@ Self-Driving Car Engineer Nanodegree Program
 ---
 
 ## Dependencies
-<iframe src="https://giphy.com/embed/CjGIVzjKBjJ0ZWI2wO" width="480" height="362" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/CjGIVzjKBjJ0ZWI2wO">via GIPHY</a></p>
+https://media.giphy.com/media/CjGIVzjKBjJ0ZWI2wO/giphy.gif
 
 * cmake >= 3.5
  * All OSes: [click here for installation instructions](https://cmake.org/install/)
