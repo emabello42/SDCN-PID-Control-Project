@@ -6,13 +6,14 @@ using namespace std;
 
 class Twiddle {
 public:
-    Twiddle(vector<double> p, int cycle, double tol=0.2)
+    Twiddle(){}
+    Twiddle(vector<double> p, vector<double> dp, int cycle, double tol=0.2)
     {
         this->p = p;
+        this->dp = dp;
         this->tol = tol;
-        for(int i=0; i < p.size(); i++)
+        for(size_t i=0; i < p.size(); i++)
         {
-            this->dp.push_back(1.0);
             this->p_phase.push_back(0);
         }
         p_idx = 0;
@@ -23,7 +24,7 @@ public:
         err = 0;
 
     }
-    vector<double> run(double err);
+    vector<double> run(double err, bool & update);
 
 private:
     vector<double> p;

@@ -1,23 +1,21 @@
 #include "twiddle.h"
 #include <iostream>
-vector<double> Twiddle::run(double cte)
+vector<double> Twiddle::run(double cte, bool & update)
 {
-    cout << endl;
-    cout << "Twiddle iteration: "<< timer << endl;
     timer++;
     err += cte*cte;
         double dp_sum = 0.0;
-        cout << "dp= ";
-        for(int i = 0; i < dp.size(); i++)
+        for(size_t i = 0; i < dp.size(); i++)
         {
-            cout << dp[i] << " ";
             dp_sum += dp[i];
         }
-        cout << endl;
     if(!error_initialized)
     {
         if((timer % update_cycle) == 0)
         {
+            cout << endl;
+            cout << "Twiddle iteration: "<< timer << " error:"<< err << endl;
+            update = true;
             best_err = err;
             error_initialized = true;
             p[p_idx] += dp[p_idx];
@@ -26,6 +24,9 @@ vector<double> Twiddle::run(double cte)
     }
     else if( (timer % update_cycle) == 0)
     {
+        cout << endl;
+        cout << "Twiddle iteration: "<< timer << " error:"<< err << endl;
+        update = true;
         if(dp_sum <= tol)
         {
             cout << "dp_sum = "<< dp_sum << endl;
@@ -38,7 +39,7 @@ vector<double> Twiddle::run(double cte)
                 {
                     cout << "#########################################"<< endl;
                     cout << "NEW BEST ERR!: " << err << endl;
-                    for(int i=0; i < p.size(); i++)
+                    for(size_t i=0; i < p.size(); i++)
                     {
                         cout << p[i] << " ";
                     }

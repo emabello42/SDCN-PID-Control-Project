@@ -34,24 +34,23 @@ std::string hasData(std::string s) {
 int main(int argc, char **argv)
 {
   uWS::Hub h;
-/*
- * NEW BEST ERR for pidSt!: 0.177037
-4.46522 6.75364 4.45978 
- * */
+
   PID pidSt;
-  PID pidTh;
-  assert(argc == 9);
-  bool use_twiddle = atoi(argv[7]);
-  pidSt.Init( atof(argv[1]), atof(argv[2]), atof(argv[3]));
-  pidTh.Init( atof(argv[4]), atof(argv[5]), atof(argv[6]));
-  //vector<double> p = {pidSt.Kp, pidSt.Ki, pidSt.Kd, pidTh.Kp, pidTh.Ki, pidTh.Kd};
-  vector<double> p1 = {pidSt.Kp, pidSt.Ki, pidSt.Kd};
-  Twiddle tw1(p1, atoi(argv[8]), 0.2);
+  assert(argc == 7);
+  bool use_twiddle = atoi(argv[5]);
+  double th_value = atof(argv[4]);
+  vector<double> p1;
+  vector<double> dp1;
+  Twiddle tw1;
+  pidSt.Init(atof(argv[1]), atof(argv[2]), atof(argv[3]));
+  if(use_twiddle){
+    p1 = {atof(argv[1]), atof(argv[2]), atof(argv[3])};
+    dp1 = {0.1*p1[0], 0.1*p1[1], 0.1*p1[2]};
+    tw1 = Twiddle(p1, dp1, atoi(argv[6]), 0.2);
   
-  vector<double> p2 = {pidTh.Kp, pidTh.Ki, pidTh.Kd};
-  Twiddle tw2(p2, atoi(argv[8]), 0.2);
+  }
   // TODO: Initialize the pid variable.
-  h.onMessage([&pidSt, &pidTh, &tw1, &tw2, &use_twiddle](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
+  h.onMessage([&pidSt, &th_value,  &tw1, &use_twiddle](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
     // The 2 signifies a websocket event
@@ -66,36 +65,36 @@ int main(int argc, char **argv)
           double cte = std::stod(j[1]["cte"].get<std::string>());
           //double speed = std::stod(j[1]["speed"].get<std::string>());
           //double angle = std::stod(j[1]["steering_angle"].get<std::string>());
-          double steer_value, th_value;
+          double steer_value;
           /*
           * TODO: Calcuate steering value here, remember the steering value is
           * [-1, 1].
           * NOTE: Feel free to play around with the throttle and speed. Maybe use
           * another PID controller to control the speed!
           */
-          //pidSt.twiddle(cte);
-          //pidTh.twiddle(fabs(cte));
-          if(use_twiddle) {
-           vector<double> p1 = tw1.run(cte);
-           vector<double> p2 = tw2.run(cte);
-           pidSt.Init( p1[0], p1[1], p1[2]);
-           pidTh.Init( p2[0], p2[1], p2[2]);
-           //pidTh.Init( p[3], p[4], p[5]);
+          if(use_twiddle)
+          {
+              bool update = false;
+              vector<double> p1 = tw1.run(cte, update);
+              if(update)
+                pidSt.Init( p1[0], p1[1], p1[2]);
+              else
+              {
+                  pidSt.Kp = p1[0];
+                  pidSt.Ki =  p1[1];
+                  pidSt.Kd =  p1[2];
+              }
           }
           cout << "pidSt: Kp = " << pidSt.Kp << " Ki = " << pidSt.Ki  << " Kd = " << pidSt.Kd << endl;
-          cout << "pidTh: Kp = " << pidTh.Kp << " Ki = " << pidTh.Ki  << " Kd = " << pidTh.Kd << endl;
           pidSt.UpdateError(cte);
-          pidTh.UpdateError(fabs(cte));
           steer_value = -pidSt.TotalError();
-          th_value = fabs(pidTh.TotalError());
           // DEBUG
-          cout << "CTE: " << cte << " Steering Value: " << steer_value << std::endl;
-
+          cout << "CTE: " << cte << " Steering Value: " << steer_value;
           json msgJson;
           msgJson["steering_angle"] = steer_value;
           msgJson["throttle"] = th_value;
           auto msg = "42[\"steer\"," + msgJson.dump() + "]";
-          std::cout << msg << std::endl;
+        //  std::cout << msg << std::endl;
           ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
         }
       } else {
