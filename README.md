@@ -1,5 +1,12 @@
 # CarND-Controls-PID
 Self-Driving Car Engineer Nanodegree Program
+## Project: PID controller
+[![Udacity - Self-Driving Car NanoDegree](https://s3.amazonaws.com/udacity-sdc/github/shield-carnd.svg)](http://www.udacity.com/drive)
+
+Overview
+---
+In this project a PID controller is implemented in C++ to maneuver the a vehicle around a track!
+The Udacity's simulator provides the cross track error (CTE) and the velocity (mph) in order to compute the appropriate steering angle.
 
 ---
 
