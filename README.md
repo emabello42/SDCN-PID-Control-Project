@@ -3,7 +3,7 @@
 
 Overview
 ---
-In this project a PID controller is implemented in C++ to maneuver the a vehicle around a track!
+In this project a PID controller is implemented in C++ to maneuver a vehicle around a track!
 The Udacity's simulator provides the cross track error (CTE) and the velocity (mph) in order to compute the appropriate steering angle.
 
 ---
