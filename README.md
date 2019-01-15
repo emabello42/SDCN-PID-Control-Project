@@ -4,9 +4,10 @@ Self-Driving Car Engineer Nanodegree Program
 ---
 
 ## Dependencies
-[image1]: https://media.giphy.com/media/CjGIVzjKBjJ0ZWI2wO/giphy.gif "Effect of P"
-
-![alt text][image1]
+[image1]: ./img/effect_of_p.gif "Effect of P"
+[image2]: ./img/effect_of_d.gif "Effect of D"
+[image3]: ./img/effect_of_i.gif "Effect of I"
+[image4]: ./img/effect_of_small_i.gif "Effect of small I"
 
 * cmake >= 3.5
  * All OSes: [click here for installation instructions](https://cmake.org/install/)
@@ -34,68 +35,45 @@ Fellow students have put together a guide to Windows set-up for the project [her
 ## Basic Build Instructions
 
 1. Clone this repo.
-2. Make a build directory: `mkdir build && cd build`
-3. Compile: `cmake .. && make`
-4. Run it: `./pid`. 
+2. Run the following script to compile: `build.sh`
+3. Run it with: `run.sh`
+4. Optionally run it, with the twiddle algorithm activated as follows: `run_twiddle.sh`
 
-Tips for setting up your environment can be found [here](https://classroom.udacity.com/nanodegrees/nd013/parts/40f38239-66b6-46ec-ae68-03afd8a601c8/modules/0949fca6-b379-42af-a919-ee50aa304e6a/lessons/f758c44c-5e40-4e01-93b5-1a82aa4e044f/concepts/23d376c7-0195-4276-bdf0-e02f1f3c665d)
+This will update Kp, Ki and Kd coefficients (used in the proportional, integral and derivative terms, respectively)  used by the PID controller and report the best combination of them (if found).
 
-## Editor Settings
+## Effect of each component of the PID controller.
 
-We've purposefully kept editor configuration files out of this repo in order to
-keep it as simple and environment agnostic as possible. However, we recommend
-using the following settings:
+If only the proportional component `P` is considered in the controller (i.e. all
+the other components are set to zero), this will drive the car as shown in the
+video below (in this case: `Kp=1, Ki=0, Kd=0`):
 
-* indent using spaces
-* set tab width to 2 spaces (keeps the matrices in source code aligned)
+![alt text][image1]
 
-## Code Style
+As can be seen, the car steers hard every time to the left and then to the right.
+This is due to the fact that P is proportional to the opposite of CTE (in
+this case: the distance to the lane center), thus steering always in the opposite direction of the error.
 
-Please (do your best to) stick to [Google's C++ style guide](https://google.github.io/styleguide/cppguide.html).
+But, if the derivate component 'D' is activated, the controller produces an output as shown below (in this case: `Kp=1, Ki=0, Kd=1`):
 
-## Project Instructions and Rubric
+![alt text][image2]
 
-Note: regardless of the changes you make, your project must be buildable using
-cmake and make!
+The `D` component helps to smooth the steering angle generated, because `D` is calculated as the
+difference between the current and the previous CTE (divided by the difference in time), thus gradually reducing the steering
+angle generated as the error decreases.
 
-More information is only accessible by people who are already enrolled in Term 2
-of CarND. If you are enrolled, see [the project page](https://classroom.udacity.com/nanodegrees/nd013/parts/40f38239-66b6-46ec-ae68-03afd8a601c8/modules/f1820894-8322-4bb3-81aa-b26b3c6dcbaf/lessons/e8235395-22dd-4b87-88e0-d108c5e5bbf4/concepts/6a4d8d42-6a04-4aa6-b284-1697c0fd6562)
-for instructions and the project rubric.
 
-## Hints!
+If the integral component `I` is activated, the controller will produce the following behavior (in this case: `Kp=1, Ki=1, Kd=1`):
 
-* You don't have to follow this directory structure, but if you do, your work
-  will span all of the .cpp files here. Keep an eye out for TODOs.
+![alt text][image3]
 
-## Call for IDE Profiles Pull Requests
+In this case, the 'I' component, which is the opposite of the sum of previous CTEs, is generating too large steering angles. But if `Ki` coefficient is reduced, this can help to produce better results as shown below (in this case: `Kp=1, Ki=0.0001, Kd=1`):
 
-Help your fellow students!
+![alt text][image4]
 
-We decided to create Makefiles with cmake to keep this project as platform
-agnostic as possible. Similarly, we omitted IDE profiles in order to we ensure
-that students don't feel pressured to use one IDE or another.
+## Final hyperparameters (Kp, Ki, Kd coefficients)
+The final values for `Kp`, `Ki` and `Kd` were calculated using the Twiddle algorithm (implemented in `src/twiddle.cpp`). This algorithm updates one single coefficient every time, searching for the best combination of them, i.e. that produces the smallest possible error.
+In this implementation, Twiddle updates every coeffcient every 1400 iterations (every iteration corresponds to a call from the simulator providing the current speed, angle and CTE values), and compares the squared sum of CTEs with the obtained one previously. 1400 iterations corresponds to a complete lap.
 
-However! I'd love to help people get up and running with their IDEs of choice.
-If you've created a profile for an IDE that you think other students would
-appreciate, we'd love to have you add the requisite profile files and
-instructions to ide_profiles/. For example if you wanted to add a VS Code
-profile, you'd add:
-
-* /ide_profiles/vscode/.vscode
-* /ide_profiles/vscode/README.md
-
-The README should explain what the profile does, how to take advantage of it,
-and how to install it.
-
-Frankly, I've never been involved in a project with multiple IDE profiles
-before. I believe the best way to handle this would be to keep them out of the
-repo root to avoid clutter. My expectation is that most profiles will include
-instructions to copy files to a new location to get picked up by the IDE, but
-that's just a guess.
-
-One last note here: regardless of the IDE used, every submitted project must
-still be compilable with cmake and make./
-
-## How to write a README
-A well written README file can enhance your project and portfolio.  Develop your abilities to create professional README files by completing [this free course](https://www.udacity.com/course/writing-readmes--ud777).
+Before the first run of twiddle, the coefficients were manually initialized. In this case, a similar combination to the proposed in the lessons worked quite well, namely: Kp=0.2, Ki=0.0001, Kd= 3. Then, after running Twiddle, these were the final coefficient values:
+Kp=0.281804, Ki=0.000101439, Kd=3.01659
 
