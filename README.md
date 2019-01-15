@@ -4,7 +4,9 @@ Self-Driving Car Engineer Nanodegree Program
 ---
 
 ## Dependencies
-https://media.giphy.com/media/CjGIVzjKBjJ0ZWI2wO/giphy.gif
+[image1]: https://media.giphy.com/media/CjGIVzjKBjJ0ZWI2wO/giphy.gif "Effect of P"
+
+![alt text][image1]
 
 * cmake >= 3.5
  * All OSes: [click here for installation instructions](https://cmake.org/install/)
